@@ -2,7 +2,7 @@ module llist_c
   implicit none
   private
   public :: llist, list_data
-  public :: list_add, list_next, list_rewind, list_clear, list_get, list_status
+  public :: list_add, list_next, list_rewind, list_clear, list_get, list_status, list_merge
 
   integer, dimension(:), allocatable :: list_data
 
@@ -39,11 +39,11 @@ contains
 
     if (associated(this%cpos%next)) then
       status = .true.
+      this%cpos => this%cpos%next
     else
       status = .false.
     end if
     
-    this%cpos = this%cpos%next
   end subroutine
   
   subroutine list_rewind(this)
@@ -83,4 +83,18 @@ contains
     
     status = associated(this%cpos)
   end function
+  
+  subroutine list_merge(list1,list2)
+    type(llist), intent(inout) :: list1
+    type(llist), intent(in) :: list2
+    logical :: status
+    
+    status = list_status(list1)
+    
+    do while (status)
+      call list_next(list1,status)
+    end do
+    
+    list1%cpos%next => list2%head%next
+  end subroutine
 end module
