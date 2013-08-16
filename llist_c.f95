@@ -84,17 +84,22 @@ contains
     status = associated(this%cpos)
   end function
   
-  subroutine list_merge(list1,list2)
-    type(llist), intent(inout) :: list1
-    type(llist), intent(in) :: list2
+  subroutine list_merge(this,appendix)
+    type(llist), intent(inout) :: this
+    type(llist), intent(in) :: appendix
     logical :: status
     
-    status = list_status(list1)
+    status = list_status(this)
     
-    do while (status)
-      call list_next(list1,status)
-    end do
+    if (status) then
+      do while (status)
+        call list_next(this,status)
+      end do
+      this%cpos%next => appendix%head%next
+    else
+      this%head%next => appendix%head%next
+      this%cpos => appendix%head%next
+    end if
     
-    list1%cpos%next => list2%head%next
   end subroutine
 end module
